@@ -11,6 +11,21 @@ namespace DBuilder {
 		ERROR_OBJECT, ERROR_FILE, ERROR_SIGNAL
 	}
 
+	private class DBuilderCallback : GLib.Object {
+
+		public string object;
+		public string signal_name;
+		public string callback;
+		public GLib.Object ? element;
+		public DBuilder dbuilder;
+
+	}
+
+	void global_callback(GLib.Object sender, DBuilderCallback cb) {
+
+		cb.dbuilder.send_callback(cb);
+	}
+
 	   /*
 		This class encapsulates a Gtk.Builder over DBus, allowing a remote program
 		to load one or several UI files, get access to the properties of all the
@@ -58,72 +73,24 @@ namespace DBuilder {
 				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 
-			/* We maintain a dictionary that maps the object pointer to the object name.
-			   This is a must in order to be able to send to the client the name of the
-			   object that generated the signal */
-			if (!this.objects.has_key(element)) {
-				this.objects.set(element,object);
-			}
+			var callback_data = new DBuilderCallback();
+			callback_data.object = object;
+			callback_data.element = element;
+			callback_data.signal_name = signal_name;
+			callback_data.callback = "on_%s_%s".printf(object,signal_name);
+			callback_data.dbuilder = this;
+			callback_data.ref(); // this ensures that the object survives after exiting this method
 
-			/* Since a signal callback passes a pointer to the object that generated the
-			   signal, we can share a callback with all the objects that can generate one
-			   specific signal. Unfortunately, the callback doesn't specificate what signal
-			   generated it, so we must have one callback for each signal name (this is: we
-			   need one callback for the "clicked" signal, but it can serve an unlimited
-			   number of buttons; also we need one different callback for the "changed"
-			   signal, but it can serve an unlimited number of Gtk.Entry widgets)
+			signal_connect(element,signal_name,(GLib.Callback) global_callback, callback_data);
 
-			   We store the signal name in a list, along with the callback associated to
-			   it. This allows to retrieve the signal name later, in the callback
-			 */
-
-			var f = this.callbacks.index_of(signal_name);
-			if (f == -1) {
-				this.callbacks.add(signal_name);
-				f = this.callbacks.index_of(signal_name);
-			}
-
-			/* Now, we connect the signal to the callback associated with that specific signal name */
-			switch (f) {
-			case 0:
-				signal_connect(element,signal_name,(GLib.Callback)this.callback0,this,0);
-			break;
-			case 1:
-				signal_connect(element,signal_name,(GLib.Callback)this.callback1,this,0);
-			break;
-			case 2:
-				signal_connect(element,signal_name,(GLib.Callback)this.callback2,this,0);
-			break;
-			default:
-				throw new Error.ERROR_SIGNAL("The signal %s can't be connected. Too many signals.".printf(signal_name));
-			}
 		}
 
-		/**
-		 * This is the first callback for signals.
-		 * Due to use g_signal_connect_object directly, the parameters are passed
-		 * to the callback inverted, so "this" points to the object that sent the
-		 * signal, and the parameter this2 points to the class.
-		 */
-		private void callback0(DBuilder this2) {
-
-			if (this2.objects.has_key(this)) {
-				this2.sent_event(this2.objects.get(this),this2.callbacks[0]);
-			}
+		[DBus(visible = false)]
+		public void send_callback(GLib.Object obj) {
+			DBuilderCallback cb = (DBuilderCallback) obj;
+			this.sent_event(cb.object,cb.signal_name);
 		}
 
-		private void callback1(DBuilder this2) {
-
-			if (this2.objects.has_key(this)) {
-				this2.sent_event(this2.objects.get(this),this2.callbacks[1]);
-			}
-		}
-
-		private void callback2(DBuilder this2) {
-			if (this2.objects.has_key(this)) {
-				this2.sent_event(this2.objects.get(this),this2.callbacks[2]);
-			}
-		}
 
 		/**
 		 * The show, show_all and hide methods must be manually implemented, because
