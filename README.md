@@ -6,10 +6,10 @@ using DBus.
 The idea is that, in order to export an interface using DBus, you need to be able
 to:
 
-    * create a graphical interface with any kind of widgets in the remote side
-    * get access to a widget in the remote side using a string identifier instead of pointers to objects
-    * get access to the public properties in any widget in the remote side using string identifiers instead of local methods
-    * get notified when a remote widget generates a signal that has interest to us
+  * create a graphical interface with any kind of widgets in the remote side
+  * get access to a widget in the remote side using a string identifier instead of pointers to objects
+  * get access to the public properties in any widget in the remote side using string identifiers instead of local methods
+  * get notified when a remote widget generates a signal that has interest to us
 
 The interesting thing about this is that Gtk3 itself has nearly all the mechanisms needed
 to do this, and only some little glue code is needed to make it work.
