@@ -9,7 +9,7 @@ class server : GLib.Object {
 	private void on_bus_aquired (DBusConnection conn) {
 		try {
 		    // start service and register it as dbus object
-		    var service = new dbuilder(global_builder);
+		    var service = new DBuilder.DBuilder(this.global_builder);
 		    conn.register_object ("/com/rastersoft/dbuilder", service);
 		    GLib.stdout.printf("Service registered\n");
 		} catch (IOError e) {
