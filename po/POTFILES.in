@@ -1,6 +1,6 @@
-src/dbuilder.vala
-src/demo.vala
 src/client/client_demo.vala
-src/client/client_demo_class.vala
+src/client/dbuilder_interface.vala
+src/server/server_demo.vala
+src/dbuilder.vala
 data/interface/iface_test.ui
 data/interface/iface_test2.ui

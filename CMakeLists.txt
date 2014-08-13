@@ -43,6 +43,7 @@ set(MODULES_TO_CHECK ${MODULES_TO_CHECK} x11)
 pkg_check_modules(DEPS REQUIRED ${MODULES_TO_CHECK})
 
 add_subdirectory(src)
+add_subdirectory(src/server)
 add_subdirectory(po)
 add_subdirectory(src/client)
 add_subdirectory(data/interface)

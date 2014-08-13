@@ -12,13 +12,14 @@ set (DOLLAR "$")
 
 configure_file (${CMAKE_SOURCE_DIR}/src/Config.vala.cmake ${CMAKE_BINARY_DIR}/src/Config.vala)
 add_definitions(-DGETTEXT_PACKAGE=\"${GETTEXT_PACKAGE}\")
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/DBuilder.pc ${CMAKE_CURRENT_BINARY_DIR}/DBuilder.pc)
 set (VERSION "1.0.0")
 add_definitions (${DEPS_CFLAGS})
 link_libraries ( ${DEPS_LIBRARIES} )
 link_directories ( ${DEPS_LIBRARY_DIRS} )
 find_package (Vala REQUIRED)
 include (ValaVersion)
-ensure_vala_version ("0.20" MINIMUM)
+ensure_vala_version ("0.24" MINIMUM)
 include (ValaPrecompile)
 
 set (VALA_PACKAGES ${VALA_PACKAGES} atk)
@@ -35,29 +36,61 @@ set (VALA_PACKAGES ${VALA_PACKAGES} x11)
 
 set (APP_SOURCES ${APP_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/Config.vala)
 set (APP_SOURCES ${APP_SOURCES} dbuilder.vala)
-set (APP_SOURCES ${APP_SOURCES} demo.vala)
 
-set (CUSTOM_VAPIS_LIST ${CUSTOM_VAPIS_LIST} ${CMAKE_SOURCE_DIR}/src/vapis/dbuilder.vapi)
+set (CUSTOM_VAPIS_LIST ${CUSTOM_VAPIS_LIST} ${CMAKE_SOURCE_DIR}/src/vapis/dbuilder_util.vapi)
 
-vala_precompile(VALA_C dbuilder
+set (COMPILE_OPTIONS ${COMPILE_OPTIONS} --library=DBuilder --gir DBuilder-1.0.gir )
+
+vala_precompile(VALA_C DBuilder
 	${APP_SOURCES}
 PACKAGES
 	${VALA_PACKAGES}
 CUSTOM_VAPIS
 	${CUSTOM_VAPIS_LIST}
+OPTIONS
+	${COMPILE_OPTIONS}
+GENERATE_VAPI
+	DBuilder
+GENERATE_HEADER
+	DBuilder
 )
 
-add_executable(dbuilder ${VALA_C})
+add_library(DBuilder SHARED ${VALA_C})
+
+set_target_properties( DBuilder PROPERTIES
+VERSION
+	1.0.0
+SOVERSION
+	1 )
 
 install(TARGETS
-	dbuilder
-RUNTIME DESTINATION
-	${CMAKE_INSTALL_BINDIR}/
+	DBuilder
+LIBRARY DESTINATION
+	${CMAKE_INSTALL_LIBDIR}/
 )
-
+install(FILES
+	${CMAKE_CURRENT_BINARY_DIR}/DBuilder.h
+DESTINATION
+	${CMAKE_INSTALL_INCLUDEDIR}/
+)
+install(FILES
+	${CMAKE_CURRENT_BINARY_DIR}/DBuilder.vapi
+DESTINATION
+	${CMAKE_INSTALL_DATAROOTDIR}/vala/vapi/
+)
+install(FILES
+	${CMAKE_CURRENT_BINARY_DIR}/DBuilder-1.0.gir
+DESTINATION
+	${CMAKE_INSTALL_DATAROOTDIR}/gir-1.0/
+)
+install(FILES
+	${CMAKE_CURRENT_BINARY_DIR}/DBuilder.pc
+DESTINATION
+	${CMAKE_INSTALL_LIBDIR}/pkgconfig/
+)
 if(HAVE_VALADOC)
-	valadoc(dbuilder
-		${CMAKE_BINARY_DIR}/valadoc/dbuilder
+	valadoc(DBuilder
+		${CMAKE_BINARY_DIR}/valadoc/DBuilder
 		${APP_SOURCES}
 	PACKAGES
 		${VALA_PACKAGES}
@@ -70,3 +103,10 @@ if(HAVE_VALADOC)
 		${CMAKE_INSTALL_DATAROOTDIR}/doc/dbuilder
 	)
 endif()
+
+install(CODE "MESSAGE (\"
+************************************************
+* Run 'sudo ldconfig' to complete installation *
+************************************************
+
+\") " )

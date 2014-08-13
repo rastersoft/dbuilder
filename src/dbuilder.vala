@@ -3,13 +3,13 @@ using Gtk;
 using GLib;
 using Gee;
 
-namespace DBuilder {
+[DBus (name = "com.rastersoft.dbuildererror")]
+public errordomain DBuilderError
+{
+	ERROR_OBJECT, ERROR_FILE, ERROR_SIGNAL
+}
 
-	[DBus (name = "com.rastersoft.dbuildererror")]
-	public errordomain Error
-	{
-		ERROR_OBJECT, ERROR_FILE, ERROR_SIGNAL
-	}
+namespace DBuilder {
 
 	private class DBuilderCallback : GLib.Object {
 
@@ -53,11 +53,11 @@ namespace DBuilder {
 		 * @param path The path to the UI file
 		 */
 
-		public void add_from_file(string path) throws Error {
+		public void add_from_file(string path) throws DBuilderError {
 			try {
 				this.builder.add_from_file(path);
 			} catch (Error e) {
-				throw new Error.ERROR_FILE(e.message);
+				throw new DBuilderError.ERROR_FILE(e.message);
 			}
 		}
 
@@ -66,11 +66,11 @@ namespace DBuilder {
 		 * @param signal_name The signal to receive
 		 * @param object The object from which we want to receive the signal
 		 */
-		public void connect_signal(string signal_name, string object) throws Error {
+		public void connect_signal(string signal_name, string object) throws DBuilderError {
 
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 
 			var callback_data = new DBuilderCallback();
@@ -97,29 +97,29 @@ namespace DBuilder {
 		 * they can't be managed with the GObject properties system
 		 */
 
-		public void show_widget(string object) throws Error {
+		public void show_widget(string object) throws DBuilderError {
 
 			Gtk.Widget ? element = (Gtk.Widget) this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			element.show();
 		}
 
-		public void show_all_widget(string object) throws Error {
+		public void show_all_widget(string object) throws DBuilderError {
 
 			Gtk.Widget ? element = (Gtk.Widget) this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			element.show_all();
 		}
 
-		public void hide_widget(string object) throws Error {
+		public void hide_widget(string object) throws DBuilderError {
 
 			Gtk.Widget ? element = (Gtk.Widget) this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			element.hide();
 		}
@@ -131,81 +131,81 @@ namespace DBuilder {
 			name
 		*/
 
-		public string get_string(string object, string property) throws Error {
+		public string get_string(string object, string property) throws DBuilderError {
 
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val = GLib.Value(typeof(string));
 			element.get_property(property, ref val);
 			return val.get_string();
 		}
 
-		public void set_string(string object, string property, string val) throws Error {
+		public void set_string(string object, string property, string val) throws DBuilderError {
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val2 = GLib.Value(typeof(string));
 			val2.set_string(val);
 			element.set_property(property,val2);
 		}
 
-		public int get_integer(string object, string property) throws Error {
+		public int get_integer(string object, string property) throws DBuilderError {
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val = GLib.Value(typeof(int));
 			element.get_property(property, ref val);
 			return val.get_int();
 		}
 
-		public void set_integer(string object, string property, int val) throws Error {
+		public void set_integer(string object, string property, int val) throws DBuilderError {
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val2 = GLib.Value(typeof(int));
 			val2.set_int(val);
 			element.set_property(property,val2);
 		}
 
-		public bool get_bool(string object, string property) throws Error {
+		public bool get_bool(string object, string property) throws DBuilderError {
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val = GLib.Value(typeof(bool));
 			element.get_property(property, ref val);
 			return val.get_boolean();
 		}
 
-		public void set_bool(string object, string property, bool val) throws Error {
+		public void set_bool(string object, string property, bool val) throws DBuilderError {
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val2 = GLib.Value(typeof(bool));
 			val2.set_boolean(val);
 			element.set_property(property,val2);
 		}
 
-		public double get_double(string object, string property) throws Error {
+		public double get_double(string object, string property) throws DBuilderError {
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val = GLib.Value(typeof(double));
 			element.get_property(property, ref val);
 			return val.get_double();
 		}
 
-		public void set_double(string object, string property, double val) throws Error {
+		public void set_double(string object, string property, double val) throws DBuilderError {
 			GLib.Object ? element = this.builder.get_object(object);
 			if (element == null) {
-				throw new Error.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
 			}
 			GLib.Value val2 = GLib.Value(typeof(double));
 			val2.set_double(val);

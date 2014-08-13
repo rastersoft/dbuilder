@@ -1,10 +1,8 @@
-## DBuilder proof of concept ##
+## DBuilder ##
 
-This is a proof of concept for a way of embedding Gtk interfaces in remote processes
-using DBus.
-
-The idea is that, in order to export an interface using DBus, you need to be able
-to:
+This is a library that allows to embed Gtk interfaces in remote processes using
+DBus. The idea is that, in order to export an interface using DBus, you need to
+be able to:
 
   * create a graphical interface with any kind of widgets in the remote side
   * get access to a widget in the remote side using a string identifier instead of pointers to objects
@@ -14,7 +12,7 @@ to:
 The interesting thing about this is that Gtk3 itself has nearly all the mechanisms needed
 to do this, and only some little glue code is needed to make it work.
 
-First, using Gtk.Builder, it is possible to create a GUI from a textual definition,
+First, by using Gtk.Builder it is possible to create a GUI from a textual definition,
 without needing to manually create objects and insert some inside others. This textual
 definition can be a string or the path for a file with that definition; both can be
 sent through DBus.
@@ -22,10 +20,10 @@ sent through DBus.
 Also, to access these widgets it is possible to use a textual description (the widget
 name) contained in an string, which also can be sent natively through DBus.
 
-Nearly all the useful data in a widget is contained in public properties. Thanks to
-the properties system available in Gtk3, it is possible to refer to a property
-using a string with its name, instead of using specific methods. Again, those
-strings can be sent through DBus.
+Nearly all the useful data in the most common widgets are contained in public
+properties. Thanks to the properties system available in Gtk3, it is possible to
+refer to a property using a string with its name, instead of using specific
+methods. Again, those strings can be sent through DBus.
 
 Finally, when setting a callback for a signal, the signal name is specified using
 a text string, so this also allows to create a DBus remote method that links a signal

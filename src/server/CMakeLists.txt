@@ -10,12 +10,13 @@ set (PREFIX ${CMAKE_INSTALL_PREFIX})
 set (VERSION "1.0.0")
 set (DOLLAR "$")
 
-configure_file (${CMAKE_SOURCE_DIR}/src/client/Config.vala.cmake ${CMAKE_BINARY_DIR}/src/client/Config.vala)
+configure_file (${CMAKE_SOURCE_DIR}/src/server/Config.vala.cmake ${CMAKE_BINARY_DIR}/src/server/Config.vala)
 add_definitions(-DGETTEXT_PACKAGE=\"${GETTEXT_PACKAGE}\")
 set (VERSION "1.0.0")
 add_definitions (${DEPS_CFLAGS})
-link_libraries ( ${DEPS_LIBRARIES} )
-link_directories ( ${DEPS_LIBRARY_DIRS} )
+include_directories ( ${CMAKE_BINARY_DIR}/src )
+link_libraries ( ${DEPS_LIBRARIES} -lDBuilder )
+link_directories ( ${DEPS_LIBRARY_DIRS} ${CMAKE_BINARY_DIR}/src )
 find_package (Vala REQUIRED)
 include (ValaVersion)
 ensure_vala_version ("0.24" MINIMUM)
@@ -25,7 +26,6 @@ set (VALA_PACKAGES ${VALA_PACKAGES} atk)
 set (VALA_PACKAGES ${VALA_PACKAGES} cairo)
 set (VALA_PACKAGES ${VALA_PACKAGES} gdk-3.0)
 set (VALA_PACKAGES ${VALA_PACKAGES} gdk-pixbuf-2.0)
-set (VALA_PACKAGES ${VALA_PACKAGES} gee-0.8)
 set (VALA_PACKAGES ${VALA_PACKAGES} gio-2.0)
 set (VALA_PACKAGES ${VALA_PACKAGES} glib-2.0)
 set (VALA_PACKAGES ${VALA_PACKAGES} gobject-2.0)
@@ -34,26 +34,29 @@ set (VALA_PACKAGES ${VALA_PACKAGES} pango)
 set (VALA_PACKAGES ${VALA_PACKAGES} x11)
 
 set (APP_SOURCES ${APP_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/Config.vala)
-set (APP_SOURCES ${APP_SOURCES} client_demo.vala)
-set (APP_SOURCES ${APP_SOURCES} dbuilder_interface.vala)
+set (APP_SOURCES ${APP_SOURCES} server_demo.vala)
 
-vala_precompile(VALA_C dbuilder_client
+set (CUSTOM_VAPIS_LIST ${CUSTOM_VAPIS_LIST} ${CMAKE_BINARY_DIR}/src/DBuilder.vapi)
+
+vala_precompile(VALA_C dbuilder_server
 	${APP_SOURCES}
 PACKAGES
 	${VALA_PACKAGES}
+CUSTOM_VAPIS
+	${CUSTOM_VAPIS_LIST}
 )
 
-add_executable(dbuilder_client ${VALA_C})
+add_executable(dbuilder_server ${VALA_C})
 
 install(TARGETS
-	dbuilder_client
+	dbuilder_server
 RUNTIME DESTINATION
 	${CMAKE_INSTALL_BINDIR}/
 )
 
 if(HAVE_VALADOC)
-	valadoc(dbuilder_client
-		${CMAKE_BINARY_DIR}/valadoc/dbuilder_client
+	valadoc(dbuilder_server
+		${CMAKE_BINARY_DIR}/valadoc/dbuilder_server
 		${APP_SOURCES}
 	PACKAGES
 		${VALA_PACKAGES}
