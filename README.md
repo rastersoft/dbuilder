@@ -58,5 +58,7 @@ to interact with a remote GUI.
 This library has been created by:
 
 Sergio Costas Rodriguez (raster@rastersoft.com)
+
 http://www.rastersoft.com
+
 https://github.com/rastersoft
