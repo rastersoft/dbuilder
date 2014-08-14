@@ -42,8 +42,8 @@ need Vala 20.0 or later, cmake and Gtk3. Just do:
 	make
 	sudo make install
 
-After doing this, just run from a terminal 'dbuilder', and from another terminal
-'dbuilder-client', in this precise order. As soon as you run the client, two windows
+After doing this, just run from a terminal 'dbuilder_server', and from another terminal
+'dbuilder_client', in this precise order. As soon as you run the client, two windows
 will be shown in the screen. One is created by the server, and the other by the client,
 but both are managed by the client using DBus. There is nothing specific for this demo
 in the server side, and any glade-generated UI file can be loaded by the client and
