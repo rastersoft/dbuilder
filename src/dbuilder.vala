@@ -81,14 +81,14 @@ namespace DBuilder {
 		}
 	}
 
-	private class DBuilderCallback : GLib.Object {
+	[Compact]
+	public class DBuilderCallback {
 
 		public string object;
 		public string signal_name;
 		public string callback;
 		public GLib.Object ? element;
 		public DBuilderServer dbuilder;
-
 	}
 
 	void global_callback(GLib.Object sender, DBuilderCallback cb) {
@@ -166,15 +166,14 @@ namespace DBuilder {
 			callback_data.signal_name = signal_name;
 			callback_data.callback = callback_name;
 			callback_data.dbuilder = this;
-			callback_data.ref(); // this ensures that the object survives after exiting this method
+			//callback_data.ref(); // this ensures that the object survives after exiting this method
 
-			signal_connect(element,signal_name,(GLib.Callback) global_callback, callback_data);
+			signal_connect(element,signal_name,(GLib.Callback) global_callback, (owned)callback_data);
 
 		}
 
 		[DBus(visible = false)]
-		public void send_callback(GLib.Object obj) {
-			DBuilderCallback cb = (DBuilderCallback) obj;
+		public void send_callback(DBuilderCallback cb) {
 			this.sent_event(cb.object,cb.signal_name,cb.callback);
 		}
 
