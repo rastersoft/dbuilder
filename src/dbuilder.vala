@@ -68,10 +68,7 @@ namespace DBuilder {
 		 */
 		public void connect_signal(string signal_name, string object) throws DBuilderError {
 
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
+			var element = this.find_element(object);
 
 			var callback_data = new DBuilderCallback();
 			callback_data.object = object;
@@ -125,6 +122,45 @@ namespace DBuilder {
 		}
 
 		/**
+			This method searchs a widget by name, and throws an exception if that widget doesn't exist
+			@param object The widget name
+		*/
+		private GLib.Object ? find_element(string object) throws DBuilderError {
+			GLib.Object ? element = this.builder.get_object(object);
+			if (element == null) {
+				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
+			}
+			return element;
+		}
+
+		/**
+			Encapsulates the job of getting the value of a property in a widget, allowing to simplify the
+			methods for getting those values
+			@param object The object that has the property to get the value
+			@param property The property to read
+			@param type_val The type of the data contained in the property (specified with 'typeof(type)')
+			@return A GLib.Value with the data requested
+		*/
+		private GLib.Value get_value(string object, string property, GLib.Type type_val) throws DBuilderError {
+
+			GLib.Value val = GLib.Value(type_val);
+			var element = this.find_element(object);
+			element.get_property(property, ref val);
+			return val;
+		}
+
+		/**
+			Encapsulates part of the job of setting the value of a property in a widget
+			@param object The object that has the property to get the value
+			@param property The property to read
+			@param val The value to store
+		*/
+		private void set_value(string object, string property,GLib.Value val) throws DBuilderError {
+			var element = this.find_element(object);
+			element.set_property(property,val);
+		}
+
+		/**
 			Here are the methods to get access to the public internal properties of
 			a widget. It takes advantage of the GObject properties system, that
 			allows to get access to the properties using a string with the property
@@ -133,83 +169,63 @@ namespace DBuilder {
 
 		public string get_string(string object, string property) throws DBuilderError {
 
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
-			GLib.Value val = GLib.Value(typeof(string));
-			element.get_property(property, ref val);
-			return val.get_string();
+			return (this.get_value(object, property, typeof(string))).get_string();
 		}
 
 		public void set_string(string object, string property, string val) throws DBuilderError {
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
+
 			GLib.Value val2 = GLib.Value(typeof(string));
 			val2.set_string(val);
-			element.set_property(property,val2);
+			this.set_value(object,property,val2);
 		}
 
 		public int get_integer(string object, string property) throws DBuilderError {
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
-			GLib.Value val = GLib.Value(typeof(int));
-			element.get_property(property, ref val);
-			return val.get_int();
+
+			return (this.get_value(object, property, typeof(int))).get_int();
 		}
 
 		public void set_integer(string object, string property, int val) throws DBuilderError {
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
+
 			GLib.Value val2 = GLib.Value(typeof(int));
 			val2.set_int(val);
-			element.set_property(property,val2);
+			this.set_value(object,property,val2);
 		}
 
 		public bool get_bool(string object, string property) throws DBuilderError {
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
-			GLib.Value val = GLib.Value(typeof(bool));
-			element.get_property(property, ref val);
-			return val.get_boolean();
+
+			return (this.get_value(object, property, typeof(bool))).get_boolean();
 		}
 
 		public void set_bool(string object, string property, bool val) throws DBuilderError {
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
+
 			GLib.Value val2 = GLib.Value(typeof(bool));
 			val2.set_boolean(val);
-			element.set_property(property,val2);
+			this.set_value(object,property,val2);
+		}
+
+		// must use double because DBus/GVariant doesn't support float
+		public double get_float(string object, string property) throws DBuilderError {
+
+			return (this.get_value(object, property, typeof(float))).get_float();
+		}
+
+		public void set_float(string object, string property, double val) throws DBuilderError {
+
+			GLib.Value val2 = GLib.Value(typeof(float));
+			val2.set_float((float)val);
+			this.set_value(object,property,val2);
 		}
 
 		public double get_double(string object, string property) throws DBuilderError {
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
-			GLib.Value val = GLib.Value(typeof(double));
-			element.get_property(property, ref val);
-			return val.get_double();
+
+			return (this.get_value(object, property, typeof(double))).get_double();
 		}
 
 		public void set_double(string object, string property, double val) throws DBuilderError {
-			GLib.Object ? element = this.builder.get_object(object);
-			if (element == null) {
-				throw new DBuilderError.ERROR_OBJECT("The object %s doesn't exists".printf(object));
-			}
+
 			GLib.Value val2 = GLib.Value(typeof(double));
 			val2.set_double(val);
-			element.set_property(property,val2);
+			this.set_value(object,property,val2);
 		}
 	}
 }
