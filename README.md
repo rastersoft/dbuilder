@@ -55,7 +55,7 @@ to interact with a remote GUI.
 
 ## About the author ##
 
-This proof of concept has been created by:
+This library has been created by:
 
 Sergio Costas Rodriguez (raster@rastersoft.com)
 http://www.rastersoft.com
