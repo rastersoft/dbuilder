@@ -1,4 +1,5 @@
 //using GIO;
+//using GModule;
 using Gtk;
 using GLib;
 using Gee;
@@ -8,8 +9,77 @@ public errordomain DBuilderError
 {
 	ERROR_OBJECT, ERROR_FILE, ERROR_SIGNAL
 }
+private delegate void DBuilder_main_callback(GLib.Object this,string obj);
 
 namespace DBuilder {
+
+	/**
+		This is the interface to allow the client to get access to the server DBuilder
+	*/
+	[DBus(name = "com.rastersoft.dbuilder")]
+	public interface DBuilder : GLib.Object {
+
+		public signal void sent_event(string obj, string event, string callback_name);
+
+		public abstract void add_from_file(string path) throws Error;
+		public abstract void connect_signal(string signal_name, string object, string callback) throws Error;
+		public abstract void connect_signals() throws Error;
+
+		public abstract void show_widget(string object) throws Error;
+		public abstract void show_all_widget(string object) throws Error;
+		public abstract void hide_widget(string object) throws Error;
+
+		public abstract string get_string(string object, string property) throws Error;
+		public abstract void set_string(string object, string property, string val) throws Error;
+		public abstract int get_integer(string object, string property) throws Error;
+		public abstract void set_integer(string object, string property, int val) throws Error;
+		public abstract bool get_bool(string object, string property) throws Error;
+		public abstract void set_bool(string object, string property, bool val) throws Error;
+		public abstract double get_float(string object, string property) throws Error;
+		public abstract void set_float(string object, string property, double val) throws Error;
+		public abstract double get_double(string object, string property) throws Error;
+		public abstract void set_double(string object, string property, double val) throws Error;
+	}
+
+	public abstract class DBuilderClient : GLib.Object {
+
+		private GLib.Module module = null;
+
+		public DBuilder? create_client (string dbus_server, string dbus_object)	 {
+
+			if (this.module == null) {
+				this.module = GLib.Module.open(null,0);
+			}
+
+			try {
+				DBuilder builder = Bus.get_proxy_sync<DBuilder> (BusType.SESSION, dbus_server, dbus_object);
+				builder.sent_event.connect(this.remote_event);
+				return builder;
+			} catch (Error e) {
+				return null;
+			}
+		}
+
+		/**
+		 This callback receives the events produced by the remote widgets
+		 and do the desired actions
+		 */
+
+		public void remote_event(string obj, string event, string callback_name) {
+
+			GLib.stdout.printf("Received event %s from object %s, for callback %s\n", event, obj, callback_name);
+			if (this.module != null) {
+				void *my_symbol;
+				if (this.module.symbol(callback_name, out my_symbol)) {
+					((DBuilder_main_callback)my_symbol)(this,obj);
+				} else {
+					GLib.stdout.printf("Callback %s not found\n",callback_name);
+				}
+			} else {
+				GLib.stdout.printf("Can't get access to the \n");
+			}
+		}
+	}
 
 	private class DBuilderCallback : GLib.Object {
 
@@ -17,7 +87,7 @@ namespace DBuilder {
 		public string signal_name;
 		public string callback;
 		public GLib.Object ? element;
-		public DBuilder dbuilder;
+		public DBuilderServer dbuilder;
 
 	}
 
@@ -34,19 +104,19 @@ namespace DBuilder {
 		*/
 
 	[DBus(name = "com.rastersoft.dbuilder")]
-	public class DBuilder : GLib.Object {
+	public class DBuilderServer : GLib.Object {
 
 		private Gtk.Builder builder;
 		private Gee.List<string> callbacks;
 		private Gee.Map<GLib.Object,string> objects;
 
-		public signal void sent_event(string obj, string event, string callback_name);
-
-		public DBuilder(Gtk.Builder builder) {
+		public DBuilderServer(Gtk.Builder builder) {
 			this.builder = builder;
 			this.callbacks = new Gee.ArrayList<string>();
 			this.objects = new Gee.HashMap<GLib.Object,string>();
 		}
+
+		public signal void sent_event(string obj, string event, string callback_name);
 
 		/**
 		 * Specifies the GLADE UI file to load in the Gtk.Builder class
@@ -67,7 +137,7 @@ namespace DBuilder {
 			if (object_w != null) {
 				this.connect_signal(signal_name,object_w.get_name(),handler_name);
 			} else {
-				print("No buildable\n");
+				print("The requested object is not a buildable object\n");
 			}
 		}
 
