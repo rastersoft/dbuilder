@@ -8,10 +8,11 @@ using Gee;
 [DBus(name = "com.rastersoft.dbuilder")]
 interface dbuilder : GLib.Object {
 
-	public signal void sent_event(string obj, string event);
+	public signal void sent_event(string obj, string event, string callback_name);
 
 	public abstract void add_from_file(string path) throws Error;
-	public abstract void connect_signal(string signal_name, string object) throws Error;
+	public abstract void connect_signal(string signal_name, string object, string callback) throws Error;
+	public abstract void connect_signals() throws Error;
 
 	public abstract void show_widget(string object) throws Error;
 	public abstract void show_all_widget(string object) throws Error;

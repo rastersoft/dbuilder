@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.16.1 -->
+<!-- Generated with glade 3.18.3 -->
 <interface>
   <requires lib="gtk+" version="3.10"/>
   <object class="GtkWindow" id="window1">
@@ -28,6 +28,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <signal name="clicked" handler="client_on_button_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -39,6 +40,7 @@
           <object class="GtkEntry" id="entry1">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <signal name="changed" handler="client_on_entry1_changed" swapped="no"/>
           </object>
           <packing>
             <property name="expand">True</property>
