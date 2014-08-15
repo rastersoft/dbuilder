@@ -96,6 +96,38 @@ namespace DBuilder {
 		public abstract void hide_widget(string object) throws Error;
 
 		/**
+		 * Gets the value of a //signed char// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @return The value contained in the property
+		 */
+		public abstract int8 get_schar(string object, string property) throws Error;
+
+		/**
+		 * Sets the value of a //signed char// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @param val The new value
+		 */
+		public abstract void set_schar(string object, string property, int8 val) throws Error;
+
+		/**
+		 * Gets the value of an //unsigned char// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @return The value contained in the property
+		 */
+		public abstract uint8 get_uchar(string object, string property) throws Error;
+
+		/**
+		 * Sets the value of an //unsigned char// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @param val The new value
+		 */
+		public abstract void set_uchar(string object, string property, uint8 val) throws Error;
+
+		/**
 		 * Gets the value of a //string// property in a remote widget
 		 * @param object The object name
 		 * @param property The property name
@@ -117,7 +149,7 @@ namespace DBuilder {
 		 * @param property The property name
 		 * @return The value contained in the property
 		 */
-		public abstract int get_integer(string object, string property) throws Error;
+		public abstract int get_int(string object, string property) throws Error;
 
 		/**
 		 * Sets the value of an //integer// property in a remote widget
@@ -125,7 +157,55 @@ namespace DBuilder {
 		 * @param property The property name
 		 * @param val The new value
 		 */
-		public abstract void set_integer(string object, string property, int val) throws Error;
+		public abstract void set_int(string object, string property, int val) throws Error;
+
+		/**
+		 * Gets the value of a //64-bit integer// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @return The value contained in the property
+		 */
+		 public abstract int64 get_int64(string object, string property) throws Error;
+
+		/**
+		 * Sets the value of a //64-bit integer// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @param val The new value
+		 */
+		public abstract void set_int64(string object, string property, int64 val) throws Error;
+
+		/**
+		 * Sets the value of an //unsigned integer// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @param val The new value
+		 */
+		public abstract uint get_uint(string object, string property) throws Error;
+
+		/**
+		 * Sets the value of an //unsigned integer// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @param val The new value
+		 */
+		public abstract void set_uint(string object, string property, uint val) throws Error;
+
+		/**
+		 * Gets the value of a //64-bit unsigned integer// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @return The value contained in the property
+		 */
+		public abstract uint64 get_uint64(string object, string property) throws Error;
+
+		/**
+		 * Sets the value of a // 64-bit unsigned integer// property in a remote widget
+		 * @param object The object name
+		 * @param property The property name
+		 * @param val The new value
+		 */
+		public abstract void set_uint64(string object, string property, uint64 val) throws Error;
 
 		/**
 		 * Gets the value of a //boolean// property in a remote widget
@@ -500,6 +580,30 @@ namespace DBuilder {
 			element.set_property(property,val);
 		}
 
+		public int8 get_schar(string object, string property) throws DBuilderError {
+
+			return (this.get_value(object, property, typeof(int8))).get_schar();
+		}
+
+		public void set_schar(string object, string property, int8 val) throws DBuilderError {
+
+			GLib.Value val2 = GLib.Value(typeof(int8));
+			val2.set_schar(val);
+			this.set_value(object,property,val2);
+		}
+
+		public uint8 get_uchar(string object, string property) throws DBuilderError {
+
+			return (this.get_value(object, property, typeof(uint8))).get_uchar();
+		}
+
+		public void set_uchar(string object, string property, uint8 val) throws DBuilderError {
+
+			GLib.Value val2 = GLib.Value(typeof(uint8));
+			val2.set_uchar(val);
+			this.set_value(object,property,val2);
+		}
+
 		public string get_string(string object, string property) throws DBuilderError {
 
 			return (this.get_value(object, property, typeof(string))).get_string();
@@ -512,17 +616,54 @@ namespace DBuilder {
 			this.set_value(object,property,val2);
 		}
 
-		public int get_integer(string object, string property) throws DBuilderError {
+		public int get_int(string object, string property) throws DBuilderError {
 
 			return (this.get_value(object, property, typeof(int))).get_int();
 		}
 
-		public void set_integer(string object, string property, int val) throws DBuilderError {
+		public void set_int(string object, string property, int val) throws DBuilderError {
 
 			GLib.Value val2 = GLib.Value(typeof(int));
 			val2.set_int(val);
 			this.set_value(object,property,val2);
 		}
+
+		public int64 get_int64(string object, string property) throws DBuilderError {
+
+			return (this.get_value(object, property, typeof(int64))).get_int64();
+		}
+
+		public void set_int64(string object, string property, int64 val) throws DBuilderError {
+
+			GLib.Value val2 = GLib.Value(typeof(int64));
+			val2.set_int64(val);
+			this.set_value(object,property,val2);
+		}
+
+		public uint get_uint(string object, string property) throws DBuilderError {
+
+			return (this.get_value(object, property, typeof(uint))).get_uint();
+		}
+
+		public void set_uint(string object, string property, uint val) throws DBuilderError {
+
+			GLib.Value val2 = GLib.Value(typeof(uint));
+			val2.set_uint(val);
+			this.set_value(object,property,val2);
+		}
+
+		public uint64 get_uint64(string object, string property) throws DBuilderError {
+
+			return (this.get_value(object, property, typeof(uint64))).get_uint64();
+		}
+
+		public void set_uint64(string object, string property, uint64 val) throws DBuilderError {
+
+			GLib.Value val2 = GLib.Value(typeof(uint64));
+			val2.set_uint64(val);
+			this.set_value(object,property,val2);
+		}
+
 
 		public bool get_bool(string object, string property) throws DBuilderError {
 
