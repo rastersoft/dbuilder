@@ -1,12 +1,33 @@
+/* DBuilder
+ * Copyright (C) 2014 Sergio Costas Rodriguez (Raster Software Vigo)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
 //using GIO;
 using Gtk;
 using GLib;
 using Gee;
+using DBuilderApplet;
+using Posix;
 
 public class client : DBuilder.DBuilderClient {
 
 	private DBuilder.DBuilder builder;
 	private Gtk.Builder builder2;
+	private DBuilderApplet.DBuilderApplet applet;
 
 	public void on_button_clicked(string obj) {
 		var w = (Gtk.Label)this.builder2.get_object("label1");
@@ -39,11 +60,14 @@ public class client : DBuilder.DBuilderClient {
 		var w2 = (Gtk.Entry)this.builder2.get_object("entry1");
 		w2.changed.connect(this.changed_entry);
 
-		/* Here we create a new remote Gtk.Builder object and connect to it through DBus */
-		this.builder = this.create_client("com.rastersoft.dbuilder","/com/rastersoft/dbuilder");
 
+		this.applet = Bus.get_proxy_sync<DBuilderApplet.DBuilderApplet> (BusType.SESSION, "com.rastersoft.dbuilderapplet", "/com/rastersoft/dbuilderapplet");
+		this.applet.add_applet("prueba_applet","document-open",DBuilderApplet.Cathegory.OTHER);
+		this.applet.set_gui("prueba_applet",GLib.Path.build_filename(Constants.PKGDATADIR,"iface_test.ui"),"box1");
+
+		this.builder = this.create_client("com.rastersoft.dbuilderapplet","/com/rastersoft/dbuilderapplet/prueba_applet");
 		// Loads this UI file
-		this.builder.add_from_file(GLib.Path.build_filename(Constants.PKGDATADIR,"iface_test.ui"));
+		//this.builder.add_from_file();
 		// And now requests to the remote Gtk.Builder to send the "clicked" signals generated,
 		// as defined in Glade
 		this.builder.connect_signals();
@@ -52,7 +76,7 @@ public class client : DBuilder.DBuilderClient {
 		//this.builder.connect_signal("changed","entry1","client_on_entry1_changed");
 
 		// Finally, requests to show the remote window
-		this.builder.show_all_widget("window1");
+		//this.builder.show_all_widget("window1");
 	}
 
 	public void run() {

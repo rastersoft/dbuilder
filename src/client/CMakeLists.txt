@@ -14,14 +14,15 @@ configure_file (${CMAKE_SOURCE_DIR}/src/client/Config.vala.cmake ${CMAKE_BINARY_
 add_definitions(-DGETTEXT_PACKAGE=\"${GETTEXT_PACKAGE}\")
 set (VERSION "1.0.0")
 add_definitions (${DEPS_CFLAGS})
-include_directories ( ${CMAKE_BINARY_DIR}/src )
-link_libraries ( ${DEPS_LIBRARIES} -lDBuilder )
-link_directories ( ${DEPS_LIBRARY_DIRS} ${CMAKE_BINARY_DIR}/src )
+include_directories ( ${CMAKE_BINARY_DIR}/src ${CMAKE_BINARY_DIR}/src/applet )
+link_libraries ( ${DEPS_LIBRARIES} -lDBuilder -lDBuilderApplet )
+link_directories ( ${DEPS_LIBRARY_DIRS} ${CMAKE_BINARY_DIR}/src ${CMAKE_BINARY_DIR}/src/applet )
 find_package (Vala REQUIRED)
 include (ValaVersion)
 ensure_vala_version ("0.24" MINIMUM)
 include (ValaPrecompile)
 
+set (VALA_PACKAGES ${VALA_PACKAGES} posix)
 set (VALA_PACKAGES ${VALA_PACKAGES} atk)
 set (VALA_PACKAGES ${VALA_PACKAGES} cairo)
 set (VALA_PACKAGES ${VALA_PACKAGES} gdk-3.0)
@@ -38,6 +39,7 @@ set (APP_SOURCES ${APP_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/Config.vala)
 set (APP_SOURCES ${APP_SOURCES} client_demo.vala)
 
 set (CUSTOM_VAPIS_LIST ${CUSTOM_VAPIS_LIST} ${CMAKE_BINARY_DIR}/src/DBuilder.vapi)
+set (CUSTOM_VAPIS_LIST ${CUSTOM_VAPIS_LIST} ${CMAKE_BINARY_DIR}/src/applet/DBuilderApplet.vapi)
 
 vala_precompile(VALA_C dbuilder_client
 	${APP_SOURCES}

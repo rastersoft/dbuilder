@@ -27,6 +27,10 @@
             <property name="label" translatable="yes">Click me</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="is_focus">True</property>
+            <property name="can_default">True</property>
+            <property name="has_default">True</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="client_on_button_clicked" swapped="no"/>
           </object>

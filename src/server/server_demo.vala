@@ -1,35 +1,43 @@
+/* DBuilder
+ * Copyright (C) 2014 Sergio Costas Rodriguez (Raster Software Vigo)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
 using GLib;
 using Gtk;
 using DBuilder;
+using DBuilderApplet;
 //using GIO;
 
 class server : GLib.Object {
 
 	private Gtk.Builder global_builder;
-
-	private void on_bus_aquired (DBusConnection conn) {
-		try {
-		    // start service and register it as dbus object
-		    var service = new DBuilder.DBuilderServer(this.global_builder);
-		    conn.register_object ("/com/rastersoft/dbuilder", service);
-		    GLib.stdout.printf("Service registered\n");
-		} catch (IOError e) {
-		    GLib.stderr.printf ("Could not register service: %s\n", e.message);
-		}
-	}
+	private DBuilderApplet.DBuilderAppletServer server;
+	private Gtk.Window w;
 
 	public server(string[] argv) {
 
 		Gtk.init(ref argv);
 
-		this.global_builder = new Gtk.Builder();
-
-		Bus.own_name (BusType.SESSION, "com.rastersoft.dbuilder", /* name to register */
-		              BusNameOwnerFlags.NONE, /* flags */
-		              on_bus_aquired, /* callback function on registration succeeded */
-		              () => {GLib.stdout.printf("Callback\n");}, /* callback on name register succeeded */
-		              () => GLib.stderr.printf ("Could not acquire name\n"));
-		                                                 /* callback on name lost */
+		this.server = new DBuilderApplet.DBuilderAppletServer(Gtk.Orientation.HORIZONTAL,0);
+		
+		this.w = new Gtk.Window();
+		w.add(this.server);
+		w.show_all();
+		
 	}
 
 	public void run_server() {
